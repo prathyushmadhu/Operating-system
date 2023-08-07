@@ -16,9 +16,9 @@ int main() {
         scanf("%d",&r[i].at);
         printf("ENTER BURST TIME : ");
         scanf("%d",&r[i].bt);
-        r[i].rt = r[i].bt;
-        r[i].wt = 0;
-        r[i].rest = 0;
+        r[i].rt = r[i].bt;  // Remaining time
+        r[i].wt = 0; 
+        r[i].rest = 0;  // response time
     }
 
     // Sort based on arrival time
@@ -59,19 +59,21 @@ int main() {
             }
         }
         
-        r[smallest_bt].wt = t - r[smallest_bt].at;
-        r[smallest_bt].rest = t-r[smallest_bt].at;
+        
+        r[smallest_bt].wt = t - r[smallest_bt].at;  // waiting time = current time - arrival time
+        r[smallest_bt].rest = t - r[smallest_bt].at; // response time = waiting time (for SJF non preemptive)
         r[smallest_bt].rt = 0;
         t+=r[smallest_bt].bt;
         printf("%s\t|%d|\t", r[smallest_bt].pid, t);
         count ++;
+        // Process execution and corresponding manipulation over
     }
     
     printf("\nCURRENT STATUS OF READY QUEUE\n");
     printf("PID\tAT\tBT\tWT\tREST\n");
     for(int i=0; i<n; i++) {
         avg_wt += r[i].wt;
-        avg_tat+=(r[i].bt + r[i].wt);
+        avg_tat+=(r[i].bt + r[i].wt);  // TAT = BT + WT
         avg_rest+=r[i].rest;
         printf("%s\t%d\t%d\t%d\t%d\n",r[i].pid,r[i].at,r[i].bt,r[i].wt,r[i].rest);
 
@@ -106,6 +108,7 @@ int main() {
             }
         }
         
+        // Manipulation start
         r[smallest_bt].rt = r[smallest_bt].rt - 1;
         if(r[smallest_bt].rt == (r[smallest_bt].bt - 1)) {
             r[smallest_bt].wt = t - r[smallest_bt].at;
@@ -116,7 +119,7 @@ int main() {
             count++;
         }
         printf("%s\t|%d|\t", r[smallest_bt].pid, t);
-        
+        // Manipulation end
     }
     
     printf("\nCURRENT STATUS OF READY QUEUE\n");
