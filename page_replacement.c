@@ -185,7 +185,7 @@ void optimal(int len, int ref[len], int size) {
                     
                     // Not clearly understood :)
                     for(int j=0; j<size; j++) {
-                        if((recent[j] == -1) && (entry[smallest])) {
+                        if((recent[j] == -1) && (entry[j]<entry[smallest])) {
                             smallest = j;
                         }
                     }
@@ -342,3 +342,4 @@ int main() {
     
     return 0;
 }
+    
