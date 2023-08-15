@@ -102,6 +102,7 @@ void lru(int len, int ref[len], int size) {
                     }
                 }
                 
+                // Replacing
                 mem[farthest] = ref[i];
                 entry[farthest] = i;
                 
@@ -119,5 +120,104 @@ void lru(int len, int ref[len], int size) {
 
 // Optimal
 void optimal(int len, int ref[len], int size) {
+    int mem[size];
+    int hit=0,miss=0;
+    int flag=-1;
+    int entry[size];
+    int recent[size];
+    int ele_count;
+    int count = 0;
+    int smallest;
     
+    for(int i=0; i<size; i++) {
+        mem[i] = -1;
+        recent[i] = -1;
+    }
+    
+    for(int i=0; i<len; i++) {
+        flag = -1;
+        
+        // Condition for hit
+        if(search(ref[i], size, mem) != -1) {
+            hit++;
+        }
+        else{
+            miss++;
+            
+            // If empty space in memory
+            for (int j=0 ; j<size ; j++){
+                if(mem[j] == -1){
+                mem[j] = ref[i];
+                entry[j] = i;  // In optimal also we are using entry
+                flag = 1;
+                break;
+                }
+            }
+            
+            if(flag == -1) {
+                count = 0;
+                
+                // To get farthest element towards right and replace it
+                for(int j=i+1; j<len;j++) {
+                    if(search(ref[j], size, mem) != -1) {
+                        
+                        // Mark 1 if element from i+1 to len is in mem
+                        if(recent[search(ref[j], size, mem)] == -1) {
+                            recent[search(ref[j], size, mem)] = 1;
+                            count++;
+                        }
+                    }
+                    
+                    if(count==(size-1)){
+                        break;
+                    }
+                }
+                
+                if(count != size - 1) {
+                    
+                    // To find the smallest among the -1 entry value
+                    for(int j=0; j<size; j++) {
+                        if(recent[j] == -1) {
+                            smallest = j;
+                            break;
+                        }
+                    }
+                    
+                    // Not clearly understood :)
+                    for(int j=0; j<size; j++) {
+                        if((recent[j] == -1) && (entry[smallest])) {
+                            smallest = j;
+                        }
+                    }
+                    
+                    // Replacing
+                    mem[smallest] = ref[i];
+                    entry[smallest] = i;
+                }
+                
+                else {
+                    for(int j=0; j<size; j++) {
+                        if(recent[j] == -1) {
+                            mem[j] = ref[i];
+                            entry[j] = i;
+                            break;
+                        }
+                    }
+                }
+                
+                // Making recent -1 for next ref[i]
+                for(int j=0; j<size; j++) {
+                    recent[j] == -1;
+                }
+            }
+        }
+        
+        // Printing each state of memory buffer
+        for(int j=0;j<size;j++){
+            printf("%d\t",mem[j]);
+        }
+        printf("\n");
+    }
+    printf("Hit ratio: %d/%d\nMiss ratio: %d/%d\nPage faults: %d", hit, len, miss, len, miss);
 }
+    
