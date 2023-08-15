@@ -207,7 +207,7 @@ void optimal(int len, int ref[len], int size) {
                 
                 // Making recent -1 for next ref[i]
                 for(int j=0; j<size; j++) {
-                    recent[j] == -1;
+                    recent[j] = -1;
                 }
             }
         }
@@ -220,4 +220,125 @@ void optimal(int len, int ref[len], int size) {
     }
     printf("Hit ratio: %d/%d\nMiss ratio: %d/%d\nPage faults: %d", hit, len, miss, len, miss);
 }
+
+// LFU
+void lfu(int len, int ref[len], int size) {
+    int mem[size];
+    int hit=0,miss=0;
+    int flag=-1;
+    int entry[size];
+    int freq[size];
+    int count=0;
+    int smallest_freq=0;
     
+    for(int i=0; i<size; i++) {
+        mem[i] = -1;
+        freq[i] = 0;
+    }
+    
+    for(int i=0; i<len; i++) {
+        flag = -1;
+        
+        // Condition for hit
+        if(search(ref[i], size, mem) != -1) {
+            hit++;
+            freq[search(ref[i], size, mem)]++;
+        }
+        else {
+            miss++;
+            
+            // If empty space in memory
+            for(int j=0; j<size; j++) {
+                if(mem[j] == -1) {
+                    mem[j] = ref[i];
+                    freq[j] = 1;
+                    entry[j] = i;
+                    flag = 1;
+                    break;
+                }
+            }
+            if(flag == -1) {
+                smallest_freq = 0;
+                
+                // To get less frequently observed numbers by far
+                for(int j=0; j<size; j++) {
+                    if(freq[smallest_freq] > freq[j]) {
+                        smallest_freq = j;
+                    }
+                }
+                
+                // When frequency of two or more process becomes equal
+                count = 0;
+                for(int j=0; j<size; j++) {
+                    if(freq[smallest_freq] == freq[j]) {
+                        count++;
+                    }
+                }
+                
+                for(int j=0; j<size; j++) {
+                    if((freq[smallest_freq] == freq[j]) && (entry[smallest_freq] > entry[j])) {
+                        smallest_freq = j;
+                    }
+                }
+                
+                // Replacing
+                mem[smallest_freq] = ref[i];
+                freq[smallest_freq] = 1;
+                entry[smallest_freq] = i;
+                
+            }
+        }
+        
+        // Printing each state of memory buffer
+        for(int j=0; j<size; j++) {
+            printf("%d\t", mem[j]);
+        }
+        printf("\n");
+    }
+    printf("Hit ratio: %d/%d\nMiss ratio: %d/%d\nPage faults: %d", hit, len, miss, len, miss);
+}
+
+int main() {
+    printf("Enter length of reference string: ");
+    int len;
+    scanf("%d",&len);
+    printf("Enter reference string: ");
+    int ref[len];
+    
+    // Taking the reference string 
+    for(int i=0; i<len; i++) {
+        scanf("%d",&ref[i]);
+    }
+    
+    int ch;
+    printf("Enter page size: ");
+    int size;
+    scanf("%d",&size);
+    
+    do{
+        printf("\n\nMENU\n1. FIFO\n2. LRU\n3. LFU\n4. OPTIMAL\n5. EXIT\n\nENTERCHOICE : ");
+        scanf("%d",&ch);
+        
+        switch(ch) {
+            case 1:
+                fifo(len, ref, size);
+                break;
+                
+            case 2:
+                lru(len, ref, size);
+                break;
+            case 3:
+                lfu(len, ref, size);
+                break;
+            case 4:
+                optimal(len, ref, size);
+                break;
+            case 5:
+                break;
+            default:
+                printf("Enter valid choice");
+        }
+    }while(ch != 5);
+    
+    return 0;
+}
